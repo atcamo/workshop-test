@@ -12,7 +12,7 @@ interface Like {
   spin: number;
   particles: { x: number; y: number; vx: number; vy: number; size: number; life: number }[];
   update: () => void;
-  draw: () => void;
+  draw: (ctx: CanvasRenderingContext2D) => void;
 }
 
 export default function LikeAnimation() {
@@ -20,9 +20,15 @@ export default function LikeAnimation() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      console.error('Canvas no está disponible');
+      return;
+    }
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.error('Contexto 2D no está disponible');
+      return;
+    }
 
     // Ajustar tamaño del canvas
     canvas.width = window.innerWidth;
@@ -30,9 +36,9 @@ export default function LikeAnimation() {
 
     // Cargar íconos
     const likeImg = new Image();
-    likeImg.src = '/like.png'; // Ícono de "like"
+    likeImg.src = '/like.png';
     const coinImg = new Image();
-    coinImg.src = '/coin.png'; // Ícono de moneda
+    coinImg.src = '/coin.png';
 
     // Array para almacenar los "likes"
     const likes: Like[] = [];
@@ -46,90 +52,83 @@ export default function LikeAnimation() {
       angle: number;
       spin: number;
       particles: { x: number; y: number; vx: number; vy: number; size: number; life: number }[];
+      private canvas: HTMLCanvasElement;
 
-      constructor() {
-        this.x = Math.random() * canvas.width;
-        this.y = -50; // Empiezan fuera de la pantalla (arriba)
-        this.size = Math.random() * 20 + 15; // Tamaño entre 15 y 35px
-        this.speed = Math.random() * 1 + 0.5; // Velocidad lenta (0.5 a 1.5px por frame)
-        this.angle = Math.random() * 360; // Rotación inicial
-        this.spin = Math.random() * 3 - 1.5; // Rotación suave
-        this.particles = []; // Array para partículas del efecto
+      constructor(canvas: HTMLCanvasElement) {
+        this.canvas = canvas;
+        this.x = Math.random() * this.canvas.width;
+        this.y = -50;
+        this.size = Math.random() * 20 + 15;
+        this.speed = Math.random() * 1 + 0.7;
+        this.angle = Math.random() * 360;
+        this.spin = Math.random() * 3 - 1.5;
+        this.particles = [];
       }
 
       update() {
-        this.y += this.speed; // Caída recta y lenta
+        this.y += this.speed;
         this.angle += this.spin;
-        // Actualizar partículas
         this.particles = this.particles.filter(p => p.life > 0);
         this.particles.forEach(p => {
           p.x += p.vx;
           p.y += p.vy;
-          p.life -= 0.05; // Reducir vida para desvanecimiento
+          p.life -= 0.05;
         });
-        // Reaparecer arriba cuando salen de la pantalla
-        if (this.y > canvas.height) {
+        if (this.y > this.canvas.height) {
           this.y = -50;
-          this.x = Math.random() * canvas.width;
+          this.x = Math.random() * this.canvas.width;
           this.particles = [];
         }
       }
 
-      draw() {
+      draw(ctx: CanvasRenderingContext2D) {
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate((this.angle * Math.PI) / 180);
 
-        // Punto de cambio de "like" a moneda
-        const changePoint = canvas.height * 0.3; // Cambia al 30% de la pantalla
-        // Punto de desvanecimiento al final de Hero
-        const fadePoint = canvas.height * 0.5; // Ajustado al ~80% de Hero (estimado)
+        const changePoint = this.canvas.height * 0.3;
+        const fadePoint = this.canvas.height * 0.5;
 
-        // Generar partículas en el momento del cambio
         if (Math.abs(this.y - changePoint) < 8 && this.particles.length === 0) {
           for (let i = 0; i < 10; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 2 + 1; // Velocidad entre 1 y 3
+            const speed = Math.random() * 2 + 1;
             this.particles.push({
               x: 0,
               y: 0,
               vx: Math.cos(angle) * speed,
               vy: Math.sin(angle) * speed,
-              size: Math.random() * this.size * 0.2 + 2, // Tamaño entre 2 y ~6px
-              life: 1, // Vida inicial
+              size: Math.random() * this.size * 0.2 + 2,
+              life: 1,
             });
           }
         }
 
-        // Generar partículas al desvanecerse en el límite de Hero
         if (Math.abs(this.y - fadePoint) < 8 && this.particles.length <= 10) {
           for (let i = 0; i < 8; i++) {
             const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 1.5 + 0.5; // Velocidad más suave
+            const speed = Math.random() * 1.5 + 0.5;
             this.particles.push({
               x: 0,
               y: 0,
               vx: Math.cos(angle) * speed,
               vy: Math.sin(angle) * speed,
-              size: Math.random() * this.size * 0.15 + 1, // Partículas más pequeñas
-              life: 0.8, // Vida más corta
+              size: Math.random() * this.size * 0.15 + 1,
+              life: 0.8,
             });
           }
         }
 
-        // Dibujar partículas
         this.particles.forEach(p => {
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, 2 * Math.PI);
-          ctx.fillStyle = p.life > 0.5 ? '#D9F99D' : '#C4B5FD'; // Transición de lima a púrpura
-          ctx.globalAlpha = p.life; // Desvanecerse con la vida
+          ctx.fillStyle = p.life > 0.5 ? '#D9F99D' : '#C4B5FD';
+          ctx.globalAlpha = p.life;
           ctx.fill();
-          ctx.globalAlpha = 1; // Restaurar opacidad
+          ctx.globalAlpha = 1;
         });
 
-        // Desvanecer ícono cerca del límite de Hero
         ctx.globalAlpha = Math.max(0, 1 - (this.y - changePoint) / (fadePoint - changePoint));
-        // Dibujar "like" antes del cambio, moneda después
         const img = this.y < changePoint ? likeImg : coinImg;
         if (this.y <= fadePoint) {
           ctx.drawImage(img, -this.size / 2, -this.size / 2, this.size, this.size);
@@ -142,7 +141,7 @@ export default function LikeAnimation() {
     // Inicializar "likes"
     const init = () => {
       for (let i = 0; i < 15; i++) {
-        likes.push(new LikeClass());
+        likes.push(new LikeClass(canvas));
       }
     };
 
@@ -151,7 +150,7 @@ export default function LikeAnimation() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       likes.forEach((like) => {
         like.update();
-        like.draw();
+        like.draw(ctx);
       });
       requestAnimationFrame(animate);
     };
@@ -170,8 +169,10 @@ export default function LikeAnimation() {
     const handleResize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      likes.length = 0;
+      init();
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize); // Línea 182 corregida
 
     // Limpieza al desmontar el componente
     return () => {

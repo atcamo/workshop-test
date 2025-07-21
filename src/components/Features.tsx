@@ -1,9 +1,9 @@
 export default function Features() {
   return (
-    <section className="px-6 py-16 bg-[#0F172A] text-center">
+    <section className="px-6 py-16 text-center" style={{ background: 'var(--background)' }}>
       <h3 className="text-3xl font-bold mb-12 text-white">¿Cómo funciona?</h3>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
-        <div className="bg-[#1E293B] p-6 rounded-lg shadow-lg">
+        <div className="p-6 rounded-lg shadow-lg" style={{ background: 'var(--border)' }}>
           <div className="text-4xl mb-4">💜</div>
           <h4 className="text-xl font-semibold mb-2">Like con tip</h4>
           <p className="text-gray-300 text-sm">
@@ -11,7 +11,7 @@ export default function Features() {
           </p>
         </div>
 
-        <div className="bg-[#1E293B] p-6 rounded-lg shadow-lg">
+        <div className="p-6 rounded-lg shadow-lg" style={{ background: 'var(--border)' }}>
           <div className="text-4xl mb-4">🎟️</div>
           <h4 className="text-xl font-semibold mb-2">Tickets automáticos</h4>
           <p className="text-gray-300 text-sm">
@@ -19,7 +19,7 @@ export default function Features() {
           </p>
         </div>
 
-        <div className="bg-[#1E293B] p-6 rounded-lg shadow-lg">
+        <div className="p-6 rounded-lg shadow-lg" style={{ background: 'var(--border)' }}>
           <div className="text-4xl mb-4">🏆</div>
           <h4 className="text-xl font-semibold mb-2">Premios en $DEGEN</h4>
           <p className="text-gray-300 text-sm">
@@ -28,5 +28,5 @@ export default function Features() {
         </div>
       </div>
     </section>
-  )
+  );
 }

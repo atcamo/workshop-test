@@ -1,45 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --background: #0F172A; /* Púrpura oscuro como fondo principal */
+  --foreground: #D9F99D; /* Lima como color de texto principal */
+  --secondary: #4C1D95; /* Púrpura medio para botones y acentos */
+  --border: #1E293B; /* Púrpura medio para bordes */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0a0a0a; /* Negro más oscuro en modo oscuro */
+    --foreground: #C4B5FD; /* Púrpura claro como texto en modo oscuro */
+    --secondary: #6B21A8; /* Púrpura más claro en modo oscuro para contraste */
+    --border: #1E293B; /* Púrpura medio consistente */
   }
 }
 
+/* Estilos personalizados */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
 
-/* src/app/globals.css */
-.animate-spin-slow {
-  animation: spin 10s linear infinite;
+header {
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
 }
 
-@keyframes spin {
-  from {
-    transform: translateX(-50%) rotate(0deg);
-  }
-  to {
-    transform: translateX(-50%) rotate(360deg);
-  }
+header a {
+  background-color: var(--secondary);
 }
 
-/* Opcional: Añadir un filtro para las monedas */
-canvas {
-  filter: hue-rotate(280deg); /* Tinte púrpura para combinar con el tema */
+header a:hover {
+  background-color: color-mix(in srgb, var(--secondary) 80%, transparent);
+}
+
+section {
+  background: linear-gradient(to bottom, var(--border), var(--background));
+}
+
+/* Estilo para la sección features */
+.features, section.features {
+  background: var(--background); /* Color sólido igual al final del degradado de hero */
 }
